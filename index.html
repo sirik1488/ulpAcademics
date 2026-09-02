@@ -2,7 +2,7 @@
 <html class="light" lang="en">
 <head>
     <meta charset="utf-8">
-    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <meta content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" name="viewport">
     <title>EduFlow - Weekly Schedule</title>
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries">
     </script>
@@ -116,6 +116,10 @@
     </script>
 
     <style>
+        * {
+            -webkit-tap-highlight-color: transparent;
+        }
+
         body {
             background: linear-gradient(135deg, #f0f7fd 0%, #e3f2fd 50%, #fff9f0 100%);
             background-attachment: fixed;
@@ -133,7 +137,7 @@
             border: 1px solid rgba(255, 255, 255, 0.5);
         }
 
-        /* Сайдбар — скруглённые углы как раньше */
+        /* ===== ДЕСКТОП САЙДБАР ===== */
         .sidebar-nav {
             position: fixed;
             left: 16px;
@@ -144,7 +148,6 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border-radius: 32px;
-            /* крупное скругление как было */
             box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
             border: 1px solid rgba(255, 255, 255, 0.5);
             display: flex;
@@ -167,18 +170,15 @@
             height: 100%;
             overflow: hidden;
         }
-
         .sidebar-nav .sidebar-top {
             flex-shrink: 0;
             margin-bottom: 20px;
         }
-
         .sidebar-nav .sidebar-middle {
             flex: 1;
             overflow-y: auto;
             padding-right: 4px;
         }
-
         .sidebar-nav .sidebar-bottom {
             flex-shrink: 0;
             padding-top: 12px;
@@ -186,6 +186,7 @@
             border-top: 1px solid #e2e2e2;
         }
 
+        /* ===== КАРТОЧКИ УРОКОВ ===== */
         .lesson-card {
             background: white;
             border-radius: 2rem;
@@ -196,6 +197,7 @@
             transition: none;
             cursor: pointer;
             user-select: none;
+            touch-action: manipulation;
         }
         .lesson-card:hover {
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04);
@@ -237,11 +239,10 @@
             font-weight: 700;
             color: #1b1b1b;
             font-family: "Comic Relief", system-ui;
-            transition: color 0.4s ease, text-decoration 0.4s ease;
+            transition: color 0.4s ease;
             position: relative;
             display: inline-block;
         }
-
         .lesson-card .subject::after {
             content: '';
             position: absolute;
@@ -255,11 +256,9 @@
             transition: width 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
             pointer-events: none;
         }
-
         .lesson-card.done .subject {
             color: #b0b0b0 !important;
         }
-
         .lesson-card.done .subject::after {
             width: 100%;
         }
@@ -285,7 +284,6 @@
             outline: 3px solid #007aff;
             background: #f0f7ff;
         }
-
         .lesson-card .delete-btn {
             position: absolute;
             top: 4px;
@@ -307,6 +305,7 @@
             box-shadow: 0 2px 8px rgba(255, 59, 48, 0.4);
             transition: all 0.2s;
             padding: 0;
+            touch-action: manipulation;
         }
         .lesson-card .delete-btn:hover {
             transform: translateX(-50%) scale(1.1);
@@ -364,17 +363,18 @@
             font-family: "Plus Jakarta Sans", system-ui;
             font-weight: 700;
         }
-
         .year-text {
             cursor: default;
             transition: all 0.2s;
+            display: inline-block;
+            padding: 0 4px;
         }
         .year-text.edit-mode {
             cursor: text;
             outline: 2px dashed #007aff;
             outline-offset: 4px;
             border-radius: 4px;
-            padding: 0 4px;
+            padding: 0 8px;
             background: rgba(255, 255, 255, 0.5);
         }
         .year-text.edit-mode:focus {
@@ -411,16 +411,13 @@
             font-family: "Comic Relief", system-ui;
         }
 
-        /* Настройки — убрал лишнюю полоску */
+        /* ===== НАСТРОЙКИ ДЕСКТОП ===== */
         .settings-container {
             position: relative;
             margin-top: auto;
             padding-top: 4px;
-            /* уменьшил отступ сверху */
         }
-
-        /* Убираем дублирующую полоску — теперь она только в .sidebar-bottom */
-        .settings-container .settings-toggle {
+        .settings-toggle {
             display: flex;
             align-items: center;
             gap: 12px;
@@ -463,7 +460,6 @@
             flex-direction: column;
             gap: 4px;
         }
-
         .sidebar-action-btn {
             display: flex;
             align-items: center;
@@ -479,6 +475,7 @@
             width: 100%;
             background: transparent;
             color: #4c4546;
+            touch-action: manipulation;
         }
         .sidebar-action-btn:hover {
             background: #e8e8e8;
@@ -502,6 +499,7 @@
             color: #1d4ed8;
         }
 
+        /* ===== МОДАЛКА ===== */
         .modal-overlay {
             display: none;
             position: fixed;
@@ -642,31 +640,427 @@
             background: #16a34a;
         }
 
-        @media (max-width: 768px) {
+        /* ===== МОБИЛЬНАЯ НИЖНЯЯ ПАНЕЛЬ ===== */
+        .mobile-bottom-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-top: 1px solid rgba(200, 200, 200, 0.2);
+            padding: 8px 12px 12px;
+            z-index: 100;
+            border-radius: 20px 20px 0 0;
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.06);
+        }
+        .mobile-bottom-nav .nav-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            gap: 4px;
+        }
+        .mobile-bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+            padding: 6px 16px;
+            border-radius: 16px;
+            background: transparent;
+            border: none;
+            color: #666;
+            font-family: "Comic Relief", system-ui;
+            font-size: 0.6rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 60px;
+            touch-action: manipulation;
+            flex: 1;
+        }
+        .mobile-bottom-nav .nav-item .material-symbols-outlined {
+            font-size: 24px;
+            transition: all 0.2s;
+        }
+        .mobile-bottom-nav .nav-item.active {
+            color: #000;
+            background: rgba(0, 0, 0, 0.06);
+        }
+        .mobile-bottom-nav .nav-item.active .material-symbols-outlined {
+            font-variation-settings: 'FILL' 1;
+        }
+        .mobile-bottom-nav .nav-item span:last-child {
+            font-size: 0.6rem;
+            font-weight: 500;
+        }
+
+        /* Мобильное меню настроек */
+        .mobile-settings-popup {
+            display: none;
+            position: fixed;
+            bottom: 80px;
+            left: 12px;
+            right: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 24px;
+            padding: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            z-index: 101;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        .mobile-settings-popup.active {
+            display: block;
+            animation: slideUp 0.3s ease;
+        }
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .mobile-settings-popup .settings-item {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            padding: 12px 16px;
+            border-radius: 16px;
+            background: transparent;
+            border: none;
+            width: 100%;
+            font-family: "Comic Relief", system-ui;
+            font-size: 0.95rem;
+            color: #1a1a1a;
+            cursor: pointer;
+            transition: all 0.15s;
+            touch-action: manipulation;
+        }
+        .mobile-settings-popup .settings-item:hover {
+            background: rgba(0, 0, 0, 0.05);
+        }
+        .mobile-settings-popup .settings-item .material-symbols-outlined {
+            font-size: 22px;
+        }
+        .mobile-settings-popup .settings-item.danger {
+            color: #dc2626;
+        }
+        .mobile-settings-popup .settings-item.primary {
+            color: #1d4ed8;
+        }
+        .mobile-settings-popup .settings-divider {
+            height: 1px;
+            background: #e2e2e2;
+            margin: 6px 0;
+        }
+
+        /* ===== МОБИЛЬНАЯ ВЕРСИЯ (простой вертикальный список) ===== */
+        .mobile-mode main {
+            margin-left: 0 !important;
+            padding: 12px 12px 80px !important;
+            height: 100dvh !important;
+            min-height: 100dvh !important;
+            max-height: 100dvh !important;
+            overflow-y: auto !important;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .mobile-mode #scheduleGrid {
+            display: flex !important;
+            flex-direction: column !important;
+            gap: 16px !important;
+            padding: 4px 0 20px !important;
+            height: auto !important;
+            overflow: visible !important;
+            grid-template-columns: none !important;
+        }
+
+        .mobile-mode .day-column {
+            scroll-snap-align: none !important;
+            min-height: auto !important;
+            padding: 4px 0 8px !important;
+            width: 100% !important;
+        }
+
+        .mobile-mode .day-column .day-header {
+            padding: 0 4px !important;
+            text-align: center !important;
+        }
+
+        .mobile-mode .day-column .day-header h3 {
+            text-align: center !important;
+            width: 100% !important;
+        }
+
+        .mobile-mode .day-column .day-header p {
+            text-align: center !important;
+            width: 100% !important;
+        }
+
+        .mobile-mode .day-column .lesson-card {
+            margin: 0 2px !important;
+            width: auto !important;
+        }
+
+        /* ===== АДАПТИВ ===== */
+        @media (max-width: 1024px) {
+            /* Планшеты и меньше */
             .sidebar-nav {
                 display: none;
             }
-            .grid-cols-5 {
-                grid-template-columns: 1fr 1fr;
+            .mobile-bottom-nav {
+                display: block;
             }
+        }
+
+        /* Вертикальная ориентация на телефонах */
+        @media (max-width: 768px) and (orientation: portrait) {
+            .sidebar-nav {
+                display: none;
+            }
+            .mobile-bottom-nav {
+                display: block;
+            }
+
+            .mobile-mode main {
+                margin-left: 0 !important;
+                padding: 12px 12px 80px !important;
+                height: 100dvh !important;
+                min-height: 100dvh !important;
+                max-height: 100dvh !important;
+                overflow-y: auto !important;
+                -webkit-overflow-scrolling: touch;
+            }
+
+            .mobile-mode #scheduleGrid {
+                display: flex !important;
+                flex-direction: column !important;
+                gap: 16px !important;
+                padding: 4px 0 20px !important;
+                height: auto !important;
+                overflow: visible !important;
+                grid-template-columns: none !important;
+            }
+
+            .mobile-mode .day-column {
+                scroll-snap-align: none !important;
+                min-height: auto !important;
+                padding: 4px 0 8px !important;
+                width: 100% !important;
+            }
+
+            .mobile-mode .day-column .day-header {
+                padding: 0 4px !important;
+                text-align: center !important;
+            }
+
+            .mobile-mode .day-column .day-header h3 {
+                text-align: center !important;
+                width: 100% !important;
+            }
+
+            .mobile-mode .day-column .day-header p {
+                text-align: center !important;
+                width: 100% !important;
+            }
+
+            .mobile-mode .day-column .lesson-card {
+                margin: 0 2px !important;
+                width: auto !important;
+            }
+
             .modal-content {
                 padding: 20px;
                 margin: 10px;
             }
-        }
-        @media (max-width: 480px) {
-            .grid-cols-5 {
-                grid-template-columns: 1fr;
+            .toast {
+                bottom: 90px;
             }
+        }
+
+        /* Альбомная ориентация на телефонах — показываем как на планшетах (2 колонки) */
+        @media (max-width: 768px) and (orientation: landscape) {
+            .sidebar-nav {
+                display: none;
+            }
+            .mobile-bottom-nav {
+                display: block;
+            }
+
+            .mobile-mode #scheduleGrid {
+                display: grid !important;
+                grid-template-columns: 1fr 1fr !important;
+                gap: 12px !important;
+                padding: 4px 0 20px !important;
+            }
+
+            .mobile-mode .day-column {
+                padding: 4px 0 8px !important;
+            }
+        }
+
+        @media (max-width: 480px) and (orientation: portrait) {
+            .mobile-mode main {
+                padding: 8px 8px 80px !important;
+            }
+            .mobile-bottom-nav .nav-item {
+                padding: 4px 8px;
+                min-width: 50px;
+            }
+            .mobile-bottom-nav .nav-item .material-symbols-outlined {
+                font-size: 22px;
+            }
+            .mobile-bottom-nav .nav-item span:last-child {
+                font-size: 0.55rem;
+            }
+            .lesson-card {
+                padding: 0.6rem 1rem !important;
+            }
+            .lesson-card .subject {
+                font-size: 1rem !important;
+            }
+            .day-header h3 {
+                font-size: 1.2rem !important;
+                text-align: center !important;
+            }
+            .day-header p {
+                font-size: 0.65rem !important;
+                text-align: center !important;
+            }
+        }
+
+        /* ПК — всегда показываем сайдбар */
+        @media (min-width: 769px) {
+            .sidebar-nav {
+                display: flex !important;
+            }
+            .mobile-bottom-nav {
+                display: none !important;
+            }
+        }
+
+        /* Скрываем скроллбары */
+        #scheduleGrid::-webkit-scrollbar {
+            width: 4px;
+            height: 4px;
+        }
+        #scheduleGrid::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        #scheduleGrid::-webkit-scrollbar-thumb {
+            background: rgba(0, 0, 0, 0.15);
+            border-radius: 10px;
+        }
+
+        /* Fix для мобильных устройств */
+        @supports (height: 100dvh) {
+            .mobile-mode main {
+                height: 100dvh !important;
+                min-height: 100dvh !important;
+                max-height: 100dvh !important;
+            }
+        }
+
+        /* Скрываем скроллбар для мобильных устройств */
+        .mobile-mode main::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+
+        .mobile-mode main {
+            scrollbar-width: none;
+            /* Firefox */
+            -ms-overflow-style: none;
+            /* IE/Edge */
+        }
+
+        /* Также скрываем для grid на мобилке */
+        .mobile-mode #scheduleGrid::-webkit-scrollbar {
+            width: 0;
+            height: 0;
+            display: none;
+        }
+
+        .mobile-mode #scheduleGrid {
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        /* ===== ЗАГОЛОВОК ПО ЦЕНТРУ НА МОБИЛКЕ ===== */
+        .mobile-mode header {
+            justify-content: center !important;
+        }
+
+        .mobile-mode header div {
+            width: 100% !important;
+            text-align: center !important;
+        }
+
+        .mobile-mode header h2 {
+            text-align: center !important;
+            width: 100% !important;
+        }
+
+        .mobile-mode header .flex {
+            width: 100% !important;
+            justify-content: center !important;
+        }
+
+        /* ===== РЕДАКТИРУЕМЫЙ ЗАГОЛОВОК ===== */
+        .editable-title {
+            cursor: default;
+            transition: all 0.2s;
+            outline: none;
+            border-radius: 4px;
+            padding: 0 4px;
+        }
+        .editable-title:focus {
+            outline: 2px dashed #007aff;
+            outline-offset: 4px;
+            background: rgba(255, 255, 255, 0.5);
+        }
+        .editable-title.edit-mode {
+            cursor: text;
+            outline: 2px dashed #007aff;
+            outline-offset: 4px;
+            background: rgba(255, 255, 255, 0.3);
+        }
+        .editable-title.edit-mode:focus {
+            outline: 3px solid #007aff;
+            background: #f0f7ff;
+        }
+
+        /* ===== ИСПРАВЛЕНИЕ ДЛЯ ГОДА ===== */
+        .sidebar-top .year-text {
+            display: inline-block;
+            max-width: 100%;
+            overflow: visible;
+            white-space: nowrap;
+            padding: 0 8px;
+        }
+
+        /* Чтобы год не обрезался */
+        .sidebar-top p {
+            overflow: visible !important;
+            white-space: nowrap;
         }
     </style>
 </head>
 
-<body class="flex overflow-hidden">
+<body>
 
     <div id="toast" class="toast"></div>
 
-    <!-- Side Navigation -->
+    <!-- ===== ДЕСКТОП САЙДБАР ===== -->
     <nav class="sidebar-nav" id="sidebarNav">
         <div class="sidebar-content">
             <div class="sidebar-top">
@@ -678,11 +1072,10 @@
                         <span class="ulp-brand">ulp</span> <span style="font-family: 'Comic Relief', system-ui;">Academics</span>
                     </h1>
                 </div>
-                <p class="text-body-md font-body-md text-muted-text" style="font-family: 'Comic Relief', system-ui;">
+                <p class="text-body-md font-body-md text-muted-text" style="font-family: 'Comic Relief', system-ui; overflow: visible !important; white-space: nowrap;">
                     <span id="yearText" class="year-text" contenteditable="false">2026-2027</span>
                 </p>
             </div>
-
             <div class="sidebar-middle">
                 <ul class="space-y-2">
                     <li>
@@ -699,7 +1092,6 @@
                     </li>
                 </ul>
             </div>
-
             <div class="sidebar-bottom">
                 <div class="settings-container">
                     <button id="settingsToggle" class="settings-toggle">
@@ -709,42 +1101,12 @@
                     </button>
                     <div id="settingsMenu" class="settings-menu">
                         <ul>
-                            <li>
-                                <button id="editToggleBtn" class="sidebar-action-btn">
-                                    <span class="material-symbols-outlined">edit</span>
-                                    <span>Редактировать</span>
-                                </button>
-                            </li>
-                            <li>
-                                <button id="resetBtn" class="sidebar-action-btn">
-                                    <span class="material-symbols-outlined">refresh</span>
-                                    <span>Обновить задачи</span>
-                                </button>
-                            </li>
-                            <li>
-                                <button id="exportBtn" class="sidebar-action-btn">
-                                    <span class="material-symbols-outlined">download</span>
-                                    <span>Скачать копию</span>
-                                </button>
-                            </li>
-                            <li>
-                                <button id="importBtn" class="sidebar-action-btn">
-                                    <span class="material-symbols-outlined">upload</span>
-                                    <span>Восстановить из файла</span>
-                                </button>
-                            </li>
-                            <li>
-                                <button id="createScheduleBtn" class="sidebar-action-btn primary">
-                                    <span class="material-symbols-outlined">auto_awesome</span>
-                                    <span>Создать своё расписание</span>
-                                </button>
-                            </li>
-                            <li>
-                                <button id="resetScheduleBtn" class="sidebar-action-btn danger">
-                                    <span class="material-symbols-outlined">restart_alt</span>
-                                    <span>Сбросить расписание</span>
-                                </button>
-                            </li>
+                            <li><button id="editToggleBtn" class="sidebar-action-btn"><span class="material-symbols-outlined">edit</span><span>Редактировать</span></button></li>
+                            <li><button id="resetBtn" class="sidebar-action-btn"><span class="material-symbols-outlined">refresh</span><span>Обновить задачи</span></button></li>
+                            <li><button id="exportBtn" class="sidebar-action-btn"><span class="material-symbols-outlined">download</span><span>Скачать копию</span></button></li>
+                            <li><button id="importBtn" class="sidebar-action-btn"><span class="material-symbols-outlined">upload</span><span>Восстановить из файла</span></button></li>
+                            <li><button id="createScheduleBtn" class="sidebar-action-btn primary"><span class="material-symbols-outlined">auto_awesome</span><span>Создать своё расписание</span></button></li>
+                            <li><button id="resetScheduleBtn" class="sidebar-action-btn danger"><span class="material-symbols-outlined">restart_alt</span><span>Сбросить расписание</span></button></li>
                         </ul>
                     </div>
                 </div>
@@ -752,54 +1114,69 @@
         </div>
     </nav>
 
+    <!-- ===== МОБИЛЬНАЯ НИЖНЯЯ ПАНЕЛЬ ===== -->
+    <div class="mobile-bottom-nav" id="mobileNav">
+        <div class="nav-row">
+            <button class="nav-item active" id="mobileScheduleBtn">
+                <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+                <span>Расписание</span>
+            </button>
+            <button class="nav-item" id="mobileStorageBtn">
+                <span class="material-symbols-outlined">assignment</span>
+                <span>Хранилище</span>
+            </button>
+            <button class="nav-item" id="mobileSettingsBtn">
+                <span class="material-symbols-outlined">settings</span>
+                <span>Настройки</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- ===== МОБИЛЬНОЕ МЕНЮ НАСТРОЕК ===== -->
+    <div class="mobile-settings-popup" id="mobileSettingsPopup">
+        <button class="settings-item" id="mEditBtn"><span class="material-symbols-outlined">edit</span> Редактировать</button>
+        <button class="settings-item" id="mResetBtn"><span class="material-symbols-outlined">refresh</span> Обновить задачи</button>
+        <button class="settings-item" id="mExportBtn"><span class="material-symbols-outlined">download</span> Скачать копию</button>
+        <button class="settings-item" id="mImportBtn"><span class="material-symbols-outlined">upload</span> Восстановить из файла</button>
+        <div class="settings-divider"></div>
+        <button class="settings-item primary" id="mCreateBtn"><span class="material-symbols-outlined">auto_awesome</span> Создать своё расписание</button>
+        <button class="settings-item danger" id="mResetScheduleBtn"><span class="material-symbols-outlined">restart_alt</span> Сбросить расписание</button>
+        <div class="settings-divider"></div>
+        <button class="settings-item" id="mCloseSettings"><span class="material-symbols-outlined">close</span> Закрыть</button>
+    </div>
+
     <input type="file" id="fileInput" accept=".json,.txt">
 
-    <!-- Модалка -->
+    <!-- ===== МОДАЛКА ===== -->
     <div id="createModal" class="modal-overlay">
         <div class="modal-content">
             <h2>Создать своё расписание</h2>
             <p class="subtitle">Вставьте ваше расписание в текстовом виде, и нейросеть поможет отформатировать его для импорта.</p>
-
             <div class="instructions">
                 <strong>Инструкция:</strong><br>
                 1. Вставьте ваше расписание в поле ниже.<br>
                 2. Нажмите «Получить промт» — скачается файл <strong>prompt.md</strong>.<br>
-                3. Отправьте этот файл нейросети (ChatGPT, Claude и др.).<br>
-                4. Нейросеть вернёт JSON-конфиг. <strong>Важно: скопируйте только JSON-код</strong> и сохраните в файл с расширением <strong>.json</strong>.<br>
-                5. Нажмите «Восстановить из файла» в меню настроек и выберите сохранённый JSON.<br>
-                <br>
-                <strong>Пример формата расписания для вставки:</strong><br>
-                Понедельник: 8:00-14:30<br>
-                1. История (15)<br>
-                2. Англ (2)<br>
-                ... и так далее для каждого дня.
+                3. Отправьте этот файл нейросети.<br>
+                4. Нейросеть вернёт JSON-конфиг. Скопируйте только JSON-код и сохраните в файл .json.<br>
+                5. Нажмите «Восстановить из файла» и выберите сохранённый JSON.
             </div>
-
             <label for="scheduleInput">Ваше расписание:</label>
-            <textarea id="scheduleInput" placeholder="Вставьте ваше расписание сюда...&#10;&#10;Пример:&#10;Понедельник: 8:00-14:30&#10;1. История (15)&#10;2. Англ (2)&#10;..."></textarea>
-
+            <textarea id="scheduleInput" placeholder="Вставьте ваше расписание сюда..."></textarea>
             <div class="modal-actions">
-                <button id="generatePromptBtn" class="btn-primary">
-                    <span class="material-symbols-outlined" style="font-size:20px;">description</span>
-                    Получить промт
-                </button>
-                <button id="closeModalBtn" class="btn-secondary">
-                    <span class="material-symbols-outlined" style="font-size:20px;">close</span>
-                    Закрыть
-                </button>
+                <button id="generatePromptBtn" class="btn-primary"><span class="material-symbols-outlined" style="font-size:20px;">description</span> Получить промт</button>
+                <button id="closeModalBtn" class="btn-secondary"><span class="material-symbols-outlined" style="font-size:20px;">close</span> Закрыть</button>
             </div>
         </div>
     </div>
 
-    <!-- Main Content -->
-    <main class="flex-1 md:ml-[320px] h-screen overflow-y-auto p-page-margin" style="margin-left: 320px; padding: 24px; overflow-y: auto; height: 100vh;">
-        <header class="flex justify-between items-end mb-10">
+    <!-- ===== ОСНОВНОЙ КОНТЕНТ ===== -->
+    <main class="flex-1 md:ml-[320px] h-screen overflow-y-auto p-page-margin" style="margin-left: 320px; padding: 24px; overflow-y: auto; height: 100vh;" id="mainContent">
+        <header class="flex justify-between items-end mb-6">
             <div>
-                <h2 class="text-display-lg font-display-lg text-primary mb-2" style="font-family: 'Comic Relief', system-ui;">Расписание</h2>
+                <h2 class="text-display-lg font-display-lg text-primary mb-1 editable-title" style="font-family: 'Comic Relief', system-ui;" contenteditable="false" id="mainTitle">Расписание</h2>
             </div>
         </header>
-
-        <div class="grid grid-cols-5 gap-card-gap pb-12" id="scheduleGrid"></div>
+        <div id="scheduleGrid" style="display: grid; grid-template-columns: repeat(5, 1fr); gap: 20px; padding-bottom: 20px;"></div>
     </main>
 
     <script>
@@ -869,6 +1246,7 @@
             let scheduleData = [];
             let isEditMode = false;
             const grid = document.getElementById('scheduleGrid');
+            const mainContent = document.getElementById('mainContent');
             const editBtn = document.getElementById('editToggleBtn');
             const resetBtn = document.getElementById('resetBtn');
             const resetScheduleBtn = document.getElementById('resetScheduleBtn');
@@ -876,6 +1254,7 @@
             const importBtn = document.getElementById('importBtn');
             const fileInput = document.getElementById('fileInput');
             const yearText = document.getElementById('yearText');
+            const mainTitle = document.getElementById('mainTitle');
             const settingsToggle = document.getElementById('settingsToggle');
             const settingsMenu = document.getElementById('settingsMenu');
             const createScheduleBtn = document.getElementById('createScheduleBtn');
@@ -885,8 +1264,22 @@
             const scheduleInput = document.getElementById('scheduleInput');
             const toast = document.getElementById('toast');
 
+            // Мобильные элементы
+            const mobileScheduleBtn = document.getElementById('mobileScheduleBtn');
+            const mobileStorageBtn = document.getElementById('mobileStorageBtn');
+            const mobileSettingsBtn = document.getElementById('mobileSettingsBtn');
+            const mobileSettingsPopup = document.getElementById('mobileSettingsPopup');
+            const mCloseSettings = document.getElementById('mCloseSettings');
+            const mEditBtn = document.getElementById('mEditBtn');
+            const mResetBtn = document.getElementById('mResetBtn');
+            const mExportBtn = document.getElementById('mExportBtn');
+            const mImportBtn = document.getElementById('mImportBtn');
+            const mCreateBtn = document.getElementById('mCreateBtn');
+            const mResetScheduleBtn = document.getElementById('mResetScheduleBtn');
+
             const STORAGE_KEY = 'eduflow_schedule_data';
             const YEAR_KEY = 'eduflow_year';
+            const TITLE_KEY = 'eduflow_title';
 
             let toastTimeout = null;
 
@@ -917,6 +1310,17 @@
                 localStorage.setItem(YEAR_KEY, yearText.textContent);
             }
 
+            function loadTitle() {
+                const saved = localStorage.getItem(TITLE_KEY);
+                if (saved) {
+                    mainTitle.textContent = saved;
+                }
+            }
+
+            function saveTitle() {
+                localStorage.setItem(TITLE_KEY, mainTitle.textContent);
+            }
+
             function loadFromStorage() {
                 const stored = localStorage.getItem(STORAGE_KEY);
                 if (stored) {
@@ -934,12 +1338,14 @@
             function saveToStorage() {
                 localStorage.setItem(STORAGE_KEY, JSON.stringify(scheduleData));
                 saveYear();
+                saveTitle();
             }
 
             function resetToDefault() {
                 if (confirm('Вы уверены, что хотите сбросить расписание к исходному состоянию?')) {
                     scheduleData = JSON.parse(JSON.stringify(defaultScheduleData));
                     yearText.textContent = '2026-2027';
+                    mainTitle.textContent = 'Расписание';
                     saveToStorage();
                     renderSchedule();
                     applyEditMode();
@@ -953,7 +1359,6 @@
                     try {
                         let content = e.target.result;
                         let parsedData = null;
-
                         try {
                             parsedData = JSON.parse(content);
                         } catch (jsonError) {
@@ -1029,37 +1434,30 @@
 
                 const prompt = `# Задача: Преобразовать расписание в JSON-формат
 
-## ВАЖНО: Верни ТОЛЬКО JSON-код, без пояснений, без markdown-разметки (не оборачивай в \`\`\`json).
+## ВАЖНО: Верни ТОЛЬКО JSON-код, без пояснений, без markdown-разметки.
 
 ## Формат JSON:
 [
   {
-    "day": "Название дня (например, Понедельник)",
-    "time": "Время начала – время окончания (например, 8:00 – 14:30)",
+    "day": "Название дня",
+    "time": "Время начала – время окончания",
     "lessons": [
-      { "period": "1", "badge": "кабинет или пометка (например, 15)", "subject": "Название предмета" }
+      { "period": "1", "badge": "кабинет или пометка", "subject": "Название предмета" }
     ]
   }
 ]
-
-## Правила:
-1. Каждый день недели — отдельный объект в массиве.
-2. Для каждого урока укажи: period (номер), badge (кабинет/пометка), subject (название).
-3. Если в расписании есть пометки в скобках — помести их в badge.
-4. Сохрани порядок предметов.
 
 ## Расписание для преобразования:
 ---
 ${userSchedule}
 ---
 
-## Инструкция для пользователя после получения JSON:
+## Инструкция для пользователя:
 1. Скопируй полученный JSON-код.
-2. Вставь в блокнот и сохрани как файл с расширением .json.
-3. Открой приложение и нажми "Восстановить из файла" в меню "Настройки".
-4. Выбери сохранённый JSON-файл.
+2. Сохрани как файл с расширением .json.
+3. Нажми "Восстановить из файла" и выбери этот файл.
 
-Теперь верни ТОЛЬКО JSON, без лишнего текста.`;
+Теперь верни ТОЛЬКО JSON.`;
 
                 const blob = new Blob([prompt], { type: 'text/markdown;charset=utf-8' });
                 const url = URL.createObjectURL(blob);
@@ -1070,8 +1468,7 @@ ${userSchedule}
                 a.click();
                 document.body.removeChild(a);
                 URL.revokeObjectURL(url);
-
-                showToast('Промт скачан! Отправьте файл нейросети.', 'success');
+                showToast('Промт скачан!', 'success');
             }
 
             function renderSchedule() {
@@ -1166,6 +1563,13 @@ ${userSchedule}
                     grid.appendChild(column);
                 });
                 applyEditMode();
+
+                // Включаем мобильный режим если нужно
+                if (window.innerWidth <= 768) {
+                    document.body.classList.add('mobile-mode');
+                } else {
+                    document.body.classList.remove('mobile-mode');
+                }
             }
 
             function applyEditMode() {
@@ -1199,10 +1603,17 @@ ${userSchedule}
                 yearText.classList.toggle('edit-mode', isEditMode);
                 yearText.setAttribute('contenteditable', isEditMode ? 'true' : 'false');
 
-                editBtn.innerHTML = isEditMode ?
-                    '<span class="material-symbols-outlined">save</span><span>Сохранить</span>' :
-                    '<span class="material-symbols-outlined">edit</span><span>Редактировать</span>';
-                editBtn.classList.toggle('active', isEditMode);
+                // Редактирование главного заголовка
+                mainTitle.classList.toggle('edit-mode', isEditMode);
+                mainTitle.setAttribute('contenteditable', isEditMode ? 'true' : 'false');
+
+                const editBtnEl = document.getElementById('editToggleBtn');
+                if (editBtnEl) {
+                    editBtnEl.innerHTML = isEditMode ?
+                        '<span class="material-symbols-outlined">save</span><span>Сохранить</span>' :
+                        '<span class="material-symbols-outlined">edit</span><span>Редактировать</span>';
+                    editBtnEl.classList.toggle('active', isEditMode);
+                }
             }
 
             function setupHeaderEditing() {
@@ -1243,6 +1654,14 @@ ${userSchedule}
                             yearText.textContent = localStorage.getItem(YEAR_KEY) || '2026-2027';
                         }
                     }
+                    if (e.target === mainTitle && mainTitle.getAttribute('contenteditable') === 'true') {
+                        const newTitle = mainTitle.textContent.trim();
+                        if (newTitle) {
+                            saveTitle();
+                        } else {
+                            mainTitle.textContent = localStorage.getItem(TITLE_KEY) || 'Расписание';
+                        }
+                    }
                 }, true);
             }
 
@@ -1250,7 +1669,6 @@ ${userSchedule}
                 const deleteBtn = e.target.closest('.delete-btn');
                 if (!deleteBtn) return;
                 if (!isEditMode) return;
-
                 e.stopPropagation();
                 const dayIdx = parseInt(deleteBtn.dataset.day);
                 const lessonIdx = parseInt(deleteBtn.dataset.lesson);
@@ -1272,91 +1690,172 @@ ${userSchedule}
                 }
             });
 
-            settingsToggle.addEventListener('click', function() {
-                settingsMenu.classList.toggle('open');
-                settingsToggle.classList.toggle('open');
-            });
-
-            editBtn.addEventListener('click', function() {
-                isEditMode = !isEditMode;
-                applyEditMode();
-                if (!isEditMode) {
-                    document.querySelectorAll('.lesson-card .subject, .lesson-card .badge, .day-header h3, .day-header p')
-                        .forEach(el => {
-                            el.blur();
-                        });
-                    yearText.blur();
-                }
-            });
-
-            resetBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                document.querySelectorAll('.lesson-card').forEach(card => {
-                    card.classList.remove('done');
+            // Десктоп настройки
+            if (settingsToggle) {
+                settingsToggle.addEventListener('click', function() {
+                    settingsMenu.classList.toggle('open');
+                    settingsToggle.classList.toggle('open');
                 });
-                saveToStorage();
-                showToast('Все задачи обновлены', 'success');
-            });
+            }
 
-            resetScheduleBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                resetToDefault();
-            });
+            // Мобильные настройки
+            if (mobileSettingsBtn) {
+                mobileSettingsBtn.addEventListener('click', function(e) {
+                    e.stopPropagation();
+                    mobileSettingsPopup.classList.toggle('active');
+                });
+            }
 
-            exportBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                const data = {
-                    year: yearText.textContent,
-                    schedule: scheduleData,
-                    exportedAt: new Date().toISOString()
-                };
-                const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download =
-                    `расписание_${yearText.textContent.replace('/', '-')}_${new Date().toISOString().slice(0,10)}.json`;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showToast('Копия скачана', 'success');
-            });
+            if (mCloseSettings) {
+                mCloseSettings.addEventListener('click', function() {
+                    mobileSettingsPopup.classList.remove('active');
+                });
+            }
 
-            importBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                fileInput.click();
-            });
-
-            fileInput.addEventListener('change', function(e) {
-                if (this.files && this.files[0]) {
-                    importSchedule(this.files[0]);
+            document.addEventListener('click', function(e) {
+                if (mobileSettingsPopup && mobileSettingsPopup.classList.contains('active')) {
+                    if (!mobileSettingsPopup.contains(e.target) && e.target !== mobileSettingsBtn && !mobileSettingsBtn
+                        .contains(e.target)) {
+                        mobileSettingsPopup.classList.remove('active');
+                    }
                 }
-                this.value = '';
             });
 
-            createScheduleBtn.addEventListener('click', function(e) {
-                e.preventDefault();
-                modal.classList.add('active');
-                scheduleInput.value = '';
-            });
+            // Мобильные кнопки
+            if (mobileScheduleBtn) {
+                mobileScheduleBtn.addEventListener('click', function() {
+                    [mobileScheduleBtn, mobileStorageBtn, mobileSettingsBtn].forEach(b => b.classList.remove(
+                    'active'));
+                    this.classList.add('active');
+                });
+            }
 
-            closeModalBtn.addEventListener('click', function() {
-                modal.classList.remove('active');
-            });
+            if (mobileStorageBtn) {
+                mobileStorageBtn.addEventListener('click', function() {
+                    [mobileScheduleBtn, mobileStorageBtn, mobileSettingsBtn].forEach(b => b.classList.remove(
+                    'active'));
+                    this.classList.add('active');
+                    showToast('(в разработке)', 'info', 1500);
+                });
+            }
 
-            modal.addEventListener('click', function(e) {
-                if (e.target === this) {
+            // Десктоп кнопки
+            if (editBtn) {
+                editBtn.addEventListener('click', function() {
+                    isEditMode = !isEditMode;
+                    applyEditMode();
+                    if (!isEditMode) {
+                        document.querySelectorAll('.lesson-card .subject, .lesson-card .badge, .day-header h3, .day-header p')
+                            .forEach(el => { el.blur(); });
+                        yearText.blur();
+                        mainTitle.blur();
+                    }
+                });
+            }
+
+            if (resetBtn) {
+                resetBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    document.querySelectorAll('.lesson-card').forEach(card => {
+                        card.classList.remove('done');
+                    });
+                    saveToStorage();
+                    showToast('Все задачи обновлены', 'success');
+                });
+            }
+
+            if (resetScheduleBtn) {
+                resetScheduleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    resetToDefault();
+                });
+            }
+
+            if (exportBtn) {
+                exportBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    const data = {
+                        year: yearText.textContent,
+                        title: mainTitle.textContent,
+                        schedule: scheduleData,
+                        exportedAt: new Date().toISOString()
+                    };
+                    const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download =
+                        `расписание_${yearText.textContent.replace('/', '-')}_${new Date().toISOString().slice(0,10)}.json`;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showToast('Копия скачана', 'success');
+                });
+            }
+
+            if (importBtn) {
+                importBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    fileInput.click();
+                });
+            }
+
+            // Мобильные кнопки-дубли
+            if (mEditBtn) mEditBtn.addEventListener('click', function() { mobileSettingsPopup.classList.remove('active');
+                editBtn.click(); });
+            if (mResetBtn) mResetBtn.addEventListener('click', function() { mobileSettingsPopup.classList.remove('active');
+                resetBtn.click(); });
+            if (mExportBtn) mExportBtn.addEventListener('click', function() { mobileSettingsPopup.classList.remove('active');
+                exportBtn.click(); });
+            if (mImportBtn) mImportBtn.addEventListener('click', function() { mobileSettingsPopup.classList.remove('active');
+                importBtn.click(); });
+            if (mCreateBtn) mCreateBtn.addEventListener('click', function() { mobileSettingsPopup.classList.remove('active');
+                createScheduleBtn.click(); });
+            if (mResetScheduleBtn) mResetScheduleBtn.addEventListener('click', function() { mobileSettingsPopup.classList.remove(
+                    'active');
+                resetScheduleBtn.click(); });
+
+            if (fileInput) {
+                fileInput.addEventListener('change', function(e) {
+                    if (this.files && this.files[0]) {
+                        importSchedule(this.files[0]);
+                    }
+                    this.value = '';
+                });
+            }
+
+            if (createScheduleBtn) {
+                createScheduleBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    modal.classList.add('active');
+                    scheduleInput.value = '';
+                });
+            }
+
+            if (closeModalBtn) {
+                closeModalBtn.addEventListener('click', function() {
                     modal.classList.remove('active');
-                }
-            });
+                });
+            }
 
-            generatePromptBtn.addEventListener('click', function() {
-                generatePrompt();
-            });
+            if (modal) {
+                modal.addEventListener('click', function(e) {
+                    if (e.target === this) {
+                        modal.classList.remove('active');
+                    }
+                });
+            }
+
+            if (generatePromptBtn) {
+                generatePromptBtn.addEventListener('click', function() {
+                    generatePrompt();
+                });
+            }
 
             function initData() {
                 loadYear();
+                loadTitle();
                 if (!loadFromStorage()) {
                     scheduleData = JSON.parse(JSON.stringify(defaultScheduleData));
                     saveToStorage();
@@ -1367,22 +1866,42 @@ ${userSchedule}
             renderSchedule();
             setupHeaderEditing();
 
+            // Определяем мобильный режим
+            function checkMobileMode() {
+                if (window.innerWidth <= 768) {
+                    document.body.classList.add('mobile-mode');
+                } else {
+                    document.body.classList.remove('mobile-mode');
+                }
+            }
+
+            checkMobileMode();
+
+            window.addEventListener('resize', function() {
+                checkMobileMode();
+            });
+
+            window.addEventListener('orientationchange', function() {
+                setTimeout(checkMobileMode, 300);
+            });
+
             document.addEventListener('blur', function(e) {
                 if (e.target.closest('.lesson-card .subject') ||
                     e.target.closest('.lesson-card .badge') ||
                     e.target.closest('.day-header h3') ||
                     e.target.closest('.day-header p') ||
-                    e.target === yearText) {
+                    e.target === yearText ||
+                    e.target === mainTitle) {
                     saveToStorage();
                 }
             }, true);
 
             console.log('Расписание загружено!');
-            console.log('Скачать копию" — сохраняет JSON.');
-            console.log('"Восстановить из файла" — загружает JSON.');
-            console.log('"Создать своё расписание" — генерирует промт.');
-            console.log('Настройки сворачиваются внизу сайдбара.');
-            console.log('Если нейросеть вернула JSON с пояснениями, приложение попробует извлечь JSON автоматически.');
+            console.log('На телефоне — простой вертикальный список');
+            console.log('Три кнопки внизу: Расписание | Хранилище | Настройки');
+            console.log('ПК версия осталась без изменений');
+            console.log('Заголовок "Расписание" можно редактировать');
+            console.log('Год "2026-2027" больше не обрезается');
         })();
     </script>
 
