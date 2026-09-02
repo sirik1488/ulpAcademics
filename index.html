@@ -121,6 +121,9 @@
             background-attachment: fixed;
             min-height: 100vh;
             font-family: "Comic Relief", system-ui !important;
+            margin: 0;
+            padding: 0;
+            overflow: hidden;
         }
 
         .glass-card {
@@ -128,6 +131,60 @@
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             border: 1px solid rgba(255, 255, 255, 0.5);
+        }
+
+        /* Сайдбар — фикс для Яндекс Браузера */
+        .sidebar-nav {
+            position: fixed;
+            left: 16px;
+            top: 16px;
+            bottom: 16px;
+            width: 288px;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            display: flex;
+            flex-direction: column;
+            padding: 24px;
+            z-index: 50;
+            overflow: hidden;
+            /* Запасной вариант для браузеров без backdrop-filter */
+            background: rgba(255, 255, 255, 0.92);
+        }
+        /* Если backdrop-filter не поддерживается, сработает запасной фон */
+        @supports not (backdrop-filter: blur(20px)) {
+            .sidebar-nav {
+                background: rgba(255, 255, 255, 0.95);
+                border: 1px solid rgba(200, 200, 200, 0.3);
+            }
+        }
+
+        .sidebar-nav .sidebar-content {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .sidebar-nav .sidebar-top {
+            flex-shrink: 0;
+            margin-bottom: 24px;
+        }
+
+        .sidebar-nav .sidebar-middle {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .sidebar-nav .sidebar-bottom {
+            flex-shrink: 0;
+            padding-top: 16px;
+            border-top: 1px solid #e2e2e2;
+            margin-top: 4px;
         }
 
         .lesson-card {
@@ -207,12 +264,6 @@
 
         .lesson-card.done .subject::after {
             width: 100%;
-        }
-
-        /* Для поддержки старых браузеров - текстовое зачёркивание как запасной вариант */
-        .lesson-card.done .subject-text-fallback {
-            text-decoration: line-through;
-            text-decoration-color: #a0a0a0;
         }
 
         .lesson-card.edit-mode .subject {
@@ -456,6 +507,7 @@
             inset: 0;
             background: rgba(0, 0, 0, 0.5);
             backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
             z-index: 1000;
             align-items: center;
             justify-content: center;
@@ -590,6 +642,9 @@
         }
 
         @media (max-width: 768px) {
+            .sidebar-nav {
+                display: none;
+            }
             .grid-cols-5 {
                 grid-template-columns: 1fr 1fr;
             }
@@ -603,6 +658,7 @@
                 grid-template-columns: 1fr;
             }
         }
+        /* Мобильная версия сайдбара (гамбургер) будет позже, пока оставляем как есть */
     </style>
 </head>
 
@@ -610,82 +666,88 @@
 
     <div id="toast" class="toast"></div>
 
-    <!-- Side Navigation -->
-    <nav class="h-screen fixed left-0 w-72 m-4 rounded-lg backdrop-blur-xl shadow-sm bg-glass-surface/80 shadow-[0_40px_80px_rgba(0,0,0,0.03)] flex flex-col p-internal-padding hidden md:flex z-50">
-        <div class="mb-6 flex-shrink-0">
-            <div class="flex items-center gap-4 mb-2">
-                <div class="w-10 h-10 bg-primary rounded-full flex items-center justify-center">
-                    <span class="material-symbols-outlined text-on-primary">school</span>
+    <!-- Side Navigation — переписан для лучшей совместимости -->
+    <nav class="sidebar-nav" id="sidebarNav">
+        <div class="sidebar-content">
+            <div class="sidebar-top">
+                <div class="flex items-center gap-4 mb-2">
+                    <div class="w-10 h-10 bg-black rounded-full flex items-center justify-center flex-shrink-0">
+                        <span class="material-symbols-outlined text-white">school</span>
+                    </div>
+                    <h1 class="text-headline-md font-headline-md font-bold text-on-surface">
+                        <span class="ulp-brand">ulp</span> <span style="font-family: 'Comic Relief', system-ui;">Academics</span>
+                    </h1>
                 </div>
-                <h1 class="text-headline-md font-headline-md font-bold text-on-surface">
-                    <span class="ulp-brand">ulp</span> <span style="font-family: 'Comic Relief', system-ui;">Academics</span>
-                </h1>
+                <p class="text-body-md font-body-md text-muted-text" style="font-family: 'Comic Relief', system-ui;">
+                    <span id="yearText" class="year-text" contenteditable="false">2026-2027</span>
+                </p>
             </div>
-            <p class="text-body-md font-body-md text-muted-text" style="font-family: 'Comic Relief', system-ui;">
-                <span id="yearText" class="year-text" contenteditable="false">2026-2027</span>
-            </p>
-        </div>
 
-        <ul class="flex-1 space-y-2 overflow-y-auto">
-            <li>
-                <a class="bg-primary text-on-primary rounded-full px-6 py-3 flex items-center gap-4 transition-all nav-btn" href="#">
-                    <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
-                    <span class="text-label-lg font-label-lg" style="font-family: 'Comic Relief', system-ui;">Расписание</span>
-                </a>
-            </li>
-            <li>
-                <a class="text-on-surface-variant rounded-full px-6 py-3 flex items-center gap-4 nav-btn" href="#" style="font-family: 'Comic Relief', system-ui; background: transparent;">
-                    <span class="material-symbols-outlined">assignment</span>
-                    <span class="text-label-lg font-label-lg" style="font-family: 'Comic Relief', system-ui;">Хранилище заданий</span>
-                </a>
-            </li>
-        </ul>
-
-        <div class="settings-container">
-            <button id="settingsToggle" class="settings-toggle">
-                <span class="material-symbols-outlined">settings</span>
-                <span>Настройки</span>
-                <span class="material-symbols-outlined" style="margin-left:auto;font-size:18px;">expand_more</span>
-            </button>
-            <div id="settingsMenu" class="settings-menu">
-                <ul>
+            <div class="sidebar-middle">
+                <ul class="space-y-2">
                     <li>
-                        <button id="editToggleBtn" class="sidebar-action-btn">
-                            <span class="material-symbols-outlined">edit</span>
-                            <span>Редактировать</span>
-                        </button>
+                        <a class="bg-black text-white rounded-full px-6 py-3 flex items-center gap-4 transition-all nav-btn" href="#">
+                            <span class="material-symbols-outlined" style="font-variation-settings: 'FILL' 1;">calendar_today</span>
+                            <span class="text-label-lg font-label-lg" style="font-family: 'Comic Relief', system-ui;">Расписание</span>
+                        </a>
                     </li>
                     <li>
-                        <button id="resetBtn" class="sidebar-action-btn">
-                            <span class="material-symbols-outlined">refresh</span>
-                            <span>Обновить задачи</span>
-                        </button>
-                    </li>
-                    <li>
-                        <button id="exportBtn" class="sidebar-action-btn">
-                            <span class="material-symbols-outlined">download</span>
-                            <span>Скачать копию</span>
-                        </button>
-                    </li>
-                    <li>
-                        <button id="importBtn" class="sidebar-action-btn">
-                            <span class="material-symbols-outlined">upload</span>
-                            <span>Восстановить из файла</span>
-                        </button>
-                    </li>
-                    <li>
-                        <button id="createScheduleBtn" class="sidebar-action-btn primary">
-                            <span class="material-symbols-outlined">auto_awesome</span>
-                            <span>Создать своё расписание</span>
-                        </button>
-                    </li>
-                    <li>
-                        <button id="resetScheduleBtn" class="sidebar-action-btn danger">
-                            <span class="material-symbols-outlined">restart_alt</span>
-                            <span>Сбросить расписание</span>
-                        </button>
+                        <a class="text-on-surface-variant rounded-full px-6 py-3 flex items-center gap-4 nav-btn" href="#" style="font-family: 'Comic Relief', system-ui; background: transparent;">
+                            <span class="material-symbols-outlined">assignment</span>
+                            <span class="text-label-lg font-label-lg" style="font-family: 'Comic Relief', system-ui;">Хранилище заданий</span>
+                        </a>
                     </li>
                 </ul>
+            </div>
+
+            <div class="sidebar-bottom">
+                <div class="settings-container">
+                    <button id="settingsToggle" class="settings-toggle">
+                        <span class="material-symbols-outlined">settings</span>
+                        <span>Настройки</span>
+                        <span class="material-symbols-outlined" style="margin-left:auto;font-size:18px;">expand_more</span>
+                    </button>
+                    <div id="settingsMenu" class="settings-menu">
+                        <ul>
+                            <li>
+                                <button id="editToggleBtn" class="sidebar-action-btn">
+                                    <span class="material-symbols-outlined">edit</span>
+                                    <span>Редактировать</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button id="resetBtn" class="sidebar-action-btn">
+                                    <span class="material-symbols-outlined">refresh</span>
+                                    <span>Обновить задачи</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button id="exportBtn" class="sidebar-action-btn">
+                                    <span class="material-symbols-outlined">download</span>
+                                    <span>Скачать копию</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button id="importBtn" class="sidebar-action-btn">
+                                    <span class="material-symbols-outlined">upload</span>
+                                    <span>Восстановить из файла</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button id="createScheduleBtn" class="sidebar-action-btn primary">
+                                    <span class="material-symbols-outlined">auto_awesome</span>
+                                    <span>Создать своё расписание</span>
+                                </button>
+                            </li>
+                            <li>
+                                <button id="resetScheduleBtn" class="sidebar-action-btn danger">
+                                    <span class="material-symbols-outlined">restart_alt</span>
+                                    <span>Сбросить расписание</span>
+                                </button>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
             </div>
         </div>
     </nav>
@@ -730,7 +792,7 @@
     </div>
 
     <!-- Main Content -->
-    <main class="flex-1 md:ml-[320px] h-screen overflow-y-auto p-page-margin">
+    <main class="flex-1 md:ml-[320px] h-screen overflow-y-auto p-page-margin" style="margin-left: 320px; padding: 24px; overflow-y: auto; height: 100vh;">
         <header class="flex justify-between items-end mb-10">
             <div>
                 <h2 class="text-display-lg font-display-lg text-primary mb-2" style="font-family: 'Comic Relief', system-ui;">Расписание</h2>
